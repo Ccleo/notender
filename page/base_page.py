@@ -1,10 +1,10 @@
-from common.function import conf, current_time, del_screenshots
+from common.function import conf, current_time, change_sc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 # from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-import time, os, shutil
+import time, os
 
 default_seconds = int(conf('config', 'DEFAULT_SECONDS'))
 the_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -14,7 +14,6 @@ class BasePage(object):
 
     # 初始化基础类
     def __init__(self, driver):
-        del_screenshots(os.path.join(conf('config','root_dir'),'screenshots'))
         self.driver = driver
         self.driver.maximize_window()
         self.driver.implicitly_wait(5)
@@ -26,10 +25,13 @@ class BasePage(object):
     # id定位元素,定位失败则自动截图
     def by_id(self, the_id, ds=default_seconds):
         # 显示等待
+
         try:
             WebDriverWait(self.driver, ds).until(EC.visibility_of_element_located((By.ID, the_id)))
         except Exception as e:
-            self.driver.get_screenshot_as_file(the_path + '/screenshots/%s.png' % time.strftime("%Y-%m-%d_%H_%M_%S"))
+            file_name = the_path + '/screenshots/%s.png' % (time.strftime("%Y-%m-%d_%H_%M_%S"))
+            self.driver.get_screenshot_as_file(file_name)
+            change_sc(file_name, the_id)
             msg = "找不到元素" + the_id
             # print(msg)
             raise TimeoutException(msg)
@@ -43,14 +45,15 @@ class BasePage(object):
         try:
             WebDriverWait(self.driver, ds).until(EC.visibility_of_element_located((By.XPATH, the_xpath)))
         except Exception as e:
-            self.driver.get_screenshot_as_file(
-                the_path + '/screenshots/%s-%s.png' % (time.strftime("%Y%m%d_%H-%M%S"), the_xpath))
+            file_name = the_path + '/screenshots/%s.png' % time.strftime("%Y-%m-%d_%H_%M_%S")
+            self.driver.get_screenshot_as_file(file_name)
+            change_sc(file_name, the_xpath)
             msg = "找不到元素" + the_xpath
             print(msg)
             # raise TimeoutException(msg)
 
-        # 隐式等待
-        # driver.implicitly_wait(2)
+            # 隐式等待
+            # driver.implicitly_wait(2)
         return self.driver.find_element_by_xpath(the_xpath)
 
     def by_xpath_complex(self, the_xpath, ds=default_seconds):

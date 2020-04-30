@@ -22,9 +22,8 @@ from page.login_page import LoginPage
 from page.home_page import HomePage
 from page.pm_projBuild_page import ProjBuildPage
 from page.pm_tenderProjRecord_page import TenderProjRecordPage
-from common.function import current_time,conf
+from common.function import current_time, conf, del_screenshots
 from page.td_bidDocRecord_page import BidDocRecordPage
-
 
 
 class Test_NoTender_NormalCase():
@@ -46,8 +45,6 @@ class Test_NoTender_NormalCase():
         self.url = conf('URL', 'base_url')
         self.driver.get(self.url)
 
-
-
     def teardown(self):
         self.driver.quit()
 
@@ -59,11 +56,12 @@ class Test_NoTender_NormalCase():
     def test_proj_build_audit(self):
         LP = LoginPage(self.driver)
         HP = HomePage(self.driver)
+        BDRP = BidDocRecordPage(self.driver)
         LP.choice_role('招标代理')
         HP.enter_page('招标文件备案')
-        BidDocRecordPage(self.driver).add_bidDocRecord()
+        BDRP.add_bidDocRecord()
 
-
+del_screenshots(os.path.join(conf('config','root_dir'),'screenshots'))
 run = Test_NoTender_NormalCase()
 run.setup()
 run.test_login()

@@ -1,8 +1,9 @@
 import configparser
-import os
+import os, shutil
 import requests
 import base64
 import time
+import cv2
 from pywinauto import application
 
 the_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -81,6 +82,8 @@ def upload(file_url):
     #     time.sleep(0.5)
     #     win32gui.SendMessage(dialog, win32con.WM_COMMAND, 1, button)
     #     time.sleep(0.5)
+
+
 def del_screenshots(path_data):
     for i in os.listdir(path_data):  # os.listdir(path_data)#返回一个列表，里面是当前目录下面的所有东西的相对路径
         file_data = path_data + "\\" + i  # 当前文件夹的下面的所有东西的绝对路径
@@ -88,3 +91,10 @@ def del_screenshots(path_data):
             os.remove(file_data)
         else:
             del_screenshots(file_data)
+
+
+def change_sc(file_name, xpath):
+    bk_img = cv2.imread(file_name)
+    # 在图片上添加文字信息
+    cv2.putText(bk_img, xpath, (40, 40), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 255), 1, cv2.LINE_AA)
+    cv2.imwrite(file_name, bk_img)
